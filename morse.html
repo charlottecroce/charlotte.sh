@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Morse Practice</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="morse">
+<div class="page">
+
+  <header>
+    <h1>charlotte.sh</h1>
+    <p class="subtitle">-.-. .... .- .-. .-.. --- - - .  -.-. .-. --- -.-. .</p>
+    <p class="meta">Burlington, VT &nbsp;&middot;&nbsp; <a href="https://github.com/charlottecroce">github.com/charlottecroce</a></p>
+    <nav class="nav">
+      <a href="index.html">home</a> &middot;
+      <!--<a href="blog.html">blog</a> &middot;-->
+      <a href="fruitbasket.html">fruitbasket</a> &middot;
+      <a href="morse.html">morse code</a>
+    </nav>
+  </header>
+
+  <hr>
+
+  <h2 class="page-title">Morse Practice</h2>
+
+  <div class="tabbar">
+    <a href="#" class="active" data-tab="type">Type</a><a href="#" data-tab="listen">Listen</a><a href="#" data-tab="learn">Learn</a>
+  </div>
+
+  <div class="panelbox">
+
+  <!-- TYPE -->
+  <div class="panel on" id="type">
+    <table class="opts">
+      <tr>
+        <td class="k">Input key</td>
+        <td><kbd id="keyName">Space</kbd> &nbsp; <button class="btn" id="bindKey">Change...</button></td>
+      </tr>
+      <tr>
+        <td class="k">Dot / dash split</td>
+        <td><input type="range" id="thresh" min="80" max="400" step="10" value="180"> <span class="morseglyph"><span id="threshVal">180</span> ms</span></td>
+      </tr>
+      <tr>
+        <td class="k">Key tone</td>
+        <td><input type="checkbox" id="typeSound" checked> on</td>
+      </tr>
+      <tr>
+        <td class="k">Tone pitch</td>
+        <td><input type="range" id="freq" min="300" max="1200" step="10" value="600"> <span class="morseglyph"><span id="freqVal">600</span> Hz</span></td>
+      </tr>
+      <tr>
+        <td class="k">Include numbers</td>
+        <td><input type="checkbox" id="numType"> 0&ndash;9</td>
+      </tr>
+    </table>
+    <div class="hintnote">
+    </div>
+
+    <hr>
+
+    <div class="stream" id="stream"></div>
+
+    <div class="keyline">
+      Now keying: <b id="curLetter">&nbsp;</b>
+      &nbsp;&nbsp; sent: <span class="enterbox" id="entered">&nbsp;</span>
+    </div>
+
+    <div>
+      <span class="viz" id="viz"><i></i><span class="mark"></span></span>
+      <span class="kind" id="kind"></span>
+    </div>
+
+    <div class="answerline" id="answer">&nbsp;</div>
+
+    <button class="btn" id="restart">Restart test</button>
+
+    <table class="stats">
+      <tr><td class="k">Speed</td><td class="v" id="sWpm">0 wpm</td>
+          <td class="k">Accuracy</td><td class="v" id="sAcc">100%</td>
+          <td class="k">Time</td><td class="v" id="sTime">0:00</td></tr>
+    </table>
+  </div>
+
+  <!-- LISTEN -->
+  <div class="panel" id="listen">
+    <table class="opts">
+      <tr>
+        <td class="k">Play</td>
+        <td>
+          <label><input type="radio" name="lmode" value="letter" checked> Letter</label> &nbsp;&nbsp;
+          <label><input type="radio" name="lmode" value="word"> Word</label>
+        </td>
+      </tr>
+      <tr>
+        <td class="k">Speed</td>
+        <td><input type="range" id="wpm" min="5" max="40" step="1" value="15"> <span class="morseglyph"><span id="wpmVal">15</span> wpm</span></td>
+      </tr>
+      <tr>
+        <td class="k">Tone pitch</td>
+        <td><input type="range" id="freqListen" min="300" max="1200" step="10" value="600"> <span class="morseglyph"><span id="freqListenVal">600</span> Hz</span></td>
+      </tr>
+      <tr>
+        <td class="k">Include numbers</td>
+        <td><input type="checkbox" id="numListen"> 0&ndash;9</td>
+      </tr>
+    </table>
+    <div class="hintnote"></div>
+
+    <hr>
+
+    <p>
+      <button class="btn" id="lPlay">Play &#9658;</button>
+      <button class="btn" id="lReplay">Replay</button>
+      <button class="btn" id="lNew">New</button>
+    </p>
+
+    <p>Answer: <input type="text" id="lInput" maxlength="1" autocomplete="off" spellcheck="false"></p>
+
+    <div class="answerline" id="lAnswer">&nbsp;</div>
+
+    <table class="stats">
+      <tr><td class="k">Correct</td><td class="v" id="lScore">0 / 0</td></tr>
+    </table>
+  </div>
+
+  <!-- LEARN -->
+  <div class="panel" id="learn">
+    <div class="hintnote"></div>
+    <hr>
+    <div class="learngrid" id="learnGrid"></div>
+  </div>
+
+  </div><!-- /panelbox -->
+
+</div>
+
+<script>
+/* data */
+var MORSE = {
+  A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",
+  J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",
+  S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..",
+  "0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....",
+  "6":"-....","7":"--...","8":"---..","9":"----."
+};
+var WORDS = ("the be to of and a in that have it for not on with he as you do at this but his by "+
+"from they we say her she or an will my one all would there their what so up out if about who get "+
+"which go me when make can like time no just him know take people into year your good some could "+
+"them see other than then now look only come its over think also back after use two how our work "+
+"first well way even new want because any these give day most us man day new old see two way boy "+
+"red big hot sun run top ten dog cat book tree road blue green fast slow open door hand word here "+
+"water light music paper river house world plant sound money music point night music horse table").split(/\s+/);
+
+var glyph = function(s){ return s.replace(/\./g,"\u00B7").replace(/-/g,"\u2212"); };
+var rand  = function(a){ return a[Math.floor(Math.random()*a.length)]; };
+
+/* audio */
+var ctx, masterGain, limiter;
+var toneFreq = 600; // shared pitch, Hz
+
+function ac(){
+  if(!ctx){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -6;
+    limiter.knee.value = 6;
+    limiter.ratio.value = 20;
+    limiter.attack.value = 0.001;
+    limiter.release.value = 0.05;
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.9;
+    limiter.connect(masterGain);
+    masterGain.connect(ctx.destination);
+  }
+  return ctx;
+}
+
+var liveOsc=null, liveGain=null;
+function toneOn(){
+  var c=ac(), now=c.currentTime;
+  liveOsc=c.createOscillator(); liveGain=c.createGain();
+  liveOsc.type="sine"; liveOsc.frequency.value=toneFreq;
+  liveOsc.connect(liveGain); liveGain.connect(limiter);
+  liveGain.gain.setValueAtTime(0.0001, now);
+  liveGain.gain.exponentialRampToValueAtTime(0.25, now+0.010); // smooth attack
+  liveOsc.start();
+}
+function toneOff(){
+  if(!liveOsc) return;
+  var c=ac(), now=c.currentTime, g=liveGain, o=liveOsc;
+  liveOsc=null; liveGain=null; // release immediately so re-triggers are clean
+  g.gain.cancelScheduledValues(now);
+  g.gain.setValueAtTime(g.gain.value, now); // anchor at the actual current level (no jump)
+  g.gain.setTargetAtTime(0.0001, now, 0.020); // exponential fade-out
+  o.stop(now+0.15); // stop only after the fade has settled
+}
+// Play plain text with morse timing.
+function playText(text, wpm, freq){
+  var c=ac(), u=1.2/wpm, t=c.currentTime+0.08, i, j;
+  var f = freq || toneFreq;
+  text=String(text).toUpperCase();
+  for(i=0;i<text.length;i++){
+    var code=MORSE[text.charAt(i)]; if(!code) continue;
+    for(j=0;j<code.length;j++){
+      var d = code.charAt(j)==="." ? u : u*3;
+      var o=c.createOscillator(), g=c.createGain();
+      o.type="sine"; o.frequency.value=f; o.connect(g); g.connect(limiter);
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.25,t+0.006);
+      g.gain.setValueAtTime(0.25,t+d-0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+      o.start(t); o.stop(t+d+0.01);
+      t += d + u; // symbol + intra-letter gap (1u)
+    }
+    t += u*2; // bring gap between letters up to 3u
+  }
+}
+
+/* tabs */
+var el=function(id){return document.getElementById(id);};
+var tabs=document.querySelectorAll('.tabbar a');
+var panels=document.querySelectorAll('.panelbox .panel');
+for(var ti=0;ti<tabs.length;ti++){
+  tabs[ti].onclick=function(e){
+    e.preventDefault(); var name=this.getAttribute('data-tab');
+    for(var j=0;j<tabs.length;j++) tabs[j].className = (tabs[j]===this?'active':'');
+    for(var k=0;k<panels.length;k++) panels[k].className = 'panel'+(panels[k].id===name?' on':'');
+    if(name==='listen') setTimeout(function(){el('lInput').focus();},0);
+  };
+}
+
+/* shared: numbers */
+var numbersOn=false;
+function syncNumbers(src){
+  numbersOn = src.checked;
+  el('numType').checked = numbersOn;
+  el('numListen').checked = numbersOn;
+}
+el('numType').onchange=function(){ syncNumbers(this); newTest(); };
+el('numListen').onchange=function(){ syncNumbers(this); };
+
+/* shared: tone pitch */
+var freqEl=el('freq'), freqVal=el('freqVal'), freqListenEl=el('freqListen'), freqListenVal=el('freqListenVal');
+function syncFreq(src){
+  toneFreq = +src.value;
+  freqEl.value = toneFreq; freqVal.textContent = toneFreq;
+  freqListenEl.value = toneFreq; freqListenVal.textContent = toneFreq;
+}
+freqEl.oninput=function(){ syncFreq(this); };
+freqListenEl.oninput=function(){ syncFreq(this); };
+
+function poolChars(){
+  var s="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  if(numbersOn) s+="0123456789";
+  return s;
+}
+
+/* TYPE MODE */
+var inputKey="Space", holdStart=0, raf=null, letterTimer=null;
+var stream=[], pos=0, entered="";
+var started=false, startTime=0, correctChars=0, errors=0, statTimer=null, errFlash=false;
+
+var streamEl=el('stream'), curLetterEl=el('curLetter'), enteredEl=el('entered'),
+    viz=el('viz'), vizBar=viz.querySelector('i'), kindEl=el('kind'),
+    answerEl=el('answer'), thresh=el('thresh'), threshVal=el('threshVal'),
+    keyName=el('keyName'), typeSound=el('typeSound');
+
+function makeToken(){
+  if(numbersOn && Math.random()<0.15){
+    var n=2+Math.floor(Math.random()*2), s="";
+    for(var i=0;i<n;i++) s+=Math.floor(Math.random()*10);
+    return s;
+  }
+  return rand(WORDS);
+}
+function extend(){
+  var tok=makeToken(), i;
+  if(stream.length) stream.push(" ");
+  for(i=0;i<tok.length;i++) stream.push(tok.charAt(i));
+}
+function ensureAhead(){ while(stream.length < pos+90) extend(); }
+function skipSpaces(){ while(stream[pos]===" ") pos++; }
+
+function target(){ return MORSE[String(stream[pos]).toUpperCase()]; }
+
+function render(){
+  ensureAhead();
+  if(pos>600){ stream.splice(0,400); pos-=400; }
+  var start=Math.max(0, pos-3), end=Math.min(stream.length, start+56), html="", i;
+  for(i=start;i<end;i++){
+    var ch = stream[i]===" " ? " " : stream[i];
+    var cls = i<pos ? "done" : (i===pos ? (errFlash?"err":"cur") : "up");
+    html += '<span class="'+cls+'">'+ch+'</span>';
+  }
+  streamEl.innerHTML=html;
+  curLetterEl.textContent = String(stream[pos]).toUpperCase();
+}
+
+function newTest(){
+  stream=[]; pos=0; entered=""; errFlash=false;
+  started=false; correctChars=0; errors=0;
+  if(statTimer){ clearInterval(statTimer); statTimer=null; }
+  extend(); skipSpaces();
+  enteredEl.innerHTML="&nbsp;"; answerEl.innerHTML="&nbsp;"; kindEl.textContent="";
+  vizBar.style.width="0"; viz.className="viz";
+  updateStats(); render();
+}
+
+function updateEntered(){ enteredEl.textContent = entered ? glyph(entered) : "\u00A0"; }
+
+function startTimerIfNeeded(){
+  if(started) return;
+  started=true; startTime=Date.now();
+  statTimer=setInterval(updateStats, 500);
+}
+function updateStats(){
+  var mins = started ? (Date.now()-startTime)/60000 : 0;
+  var wpm = mins>0 ? Math.round((correctChars/5)/mins) : 0;
+  var total = correctChars+errors;
+  var acc = total>0 ? Math.round(correctChars/total*100) : 100;
+  el('sWpm').textContent = wpm+" wpm";
+  el('sAcc').textContent = acc+"%";
+  var secs = started ? Math.floor((Date.now()-startTime)/1000) : 0;
+  el('sTime').textContent = Math.floor(secs/60)+":"+("0"+(secs%60)).slice(-2);
+}
+
+function advance(){
+  correctChars++;
+  pos++; ensureAhead(); skipSpaces();
+  entered=""; answerEl.innerHTML="&nbsp;"; updateEntered();
+  render(); updateStats();
+}
+function flagWrong(){
+  errors++;
+  var t=target();
+  answerEl.className="answerline no";
+  answerEl.innerHTML = '&#10007; '+String(stream[pos]).toUpperCase()+' = <span class="ans">'+glyph(t)+'</span> &nbsp; (retype it)';
+  entered=""; updateEntered();
+  errFlash=true; render();
+  setTimeout(function(){ errFlash=false; render(); }, 220);
+  updateStats();
+}
+
+function addSymbol(sym){
+  startTimerIfNeeded();
+  clearTimeout(letterTimer);
+  entered += sym; updateEntered();
+  var t=target();
+  if(entered===t){ advance(); }
+  else if(t.indexOf(entered)===0){
+    // valid prefix: wait, but fall back to "wrong/incomplete" if they give up
+    letterTimer=setTimeout(flagWrong, 1400);
+  } else {
+    flagWrong();
+  }
+}
+
+/* hold visualizer */
+function animateHold(){
+  var t=performance.now()-holdStart, max=(+thresh.value)*2;
+  vizBar.style.width = Math.min(100, t/max*100)+"%";
+  var dash = t >= +thresh.value;
+  viz.className = "viz"+(dash?" dash":"");
+  kindEl.textContent = dash ? "dash \u2212" : "dot \u00B7";
+  raf=requestAnimationFrame(animateHold);
+}
+
+thresh.oninput=function(){ threshVal.textContent=thresh.value; };
+
+var binding=false;
+el('bindKey').onclick=function(){ binding=true; keyName.textContent="press a key..."; };
+function keyLabel(code){ return code==="Space" ? "Space" : code.replace(/^Key|^Digit/,''); }
+
+document.addEventListener('keydown', function(e){
+  if(binding){ e.preventDefault(); inputKey=e.code||e.key; keyName.textContent=keyLabel(inputKey); binding=false; return; }
+  if(!el('type').classList.contains('on')) return;
+  if((e.code||e.key)!==inputKey) return;
+  e.preventDefault();
+  if(holdStart) return; // ignore auto-repeat
+  holdStart=performance.now();
+  if(typeSound.checked) toneOn();
+  animateHold();
+});
+document.addEventListener('keyup', function(e){
+  if((e.code||e.key)!==inputKey || !holdStart) return;
+  e.preventDefault();
+  var dur=performance.now()-holdStart; holdStart=0;
+  toneOff(); cancelAnimationFrame(raf);
+  vizBar.style.width="0"; viz.className="viz"; kindEl.textContent="";
+  addSymbol(dur < +thresh.value ? "." : "-");
+});
+el('restart').onclick=function(){ newTest(); };
+
+/* LISTEN MODE */
+var lTarget="", lTotal=0, lCorrect=0, lAnswered=false;
+var lInput=el('lInput'), lAnswer=el('lAnswer'), lScore=el('lScore'),
+    wpm=el('wpm'), wpmVal=el('wpmVal');
+wpm.oninput=function(){ wpmVal.textContent=wpm.value; };
+
+function listenMode(){
+  var r=document.querySelector('input[name=lmode]:checked');
+  return r ? r.value : 'letter';
+}
+function pickTarget(){
+  if(listenMode()==='word'){
+    if(numbersOn && Math.random()<0.15){
+      var n=2+Math.floor(Math.random()*3), s="", i;
+      for(i=0;i<n;i++) s+=Math.floor(Math.random()*10);
+      return s;
+    }
+    return rand(WORDS).toUpperCase();
+  }
+  var pool=poolChars();
+  return pool.charAt(Math.floor(Math.random()*pool.length));
+}
+function lNew(play){
+  var word = listenMode()==='word';
+  lTarget=pickTarget(); lAnswered=false;
+  lInput.value="";
+  lInput.maxLength = word ? 24 : 1;
+  lInput.style.width = word ? "190px" : "44px";
+  lInput.style.textAlign = word ? "left" : "center";
+  lAnswer.innerHTML="&nbsp;"; lAnswer.className="answerline";
+  lInput.focus();
+  if(play) playText(lTarget, +wpm.value);
+}
+function checkAnswer(){
+  if(lAnswered || !lTarget) return;
+  var v=lInput.value.toUpperCase().replace(/\s+/g,"");
+  if(!v) return;
+  lAnswered=true; lTotal++;
+  if(v===String(lTarget).toUpperCase()){
+    lCorrect++;
+    lAnswer.className="answerline ok"; lAnswer.innerHTML="&#10003; correct";
+    setTimeout(function(){ lNew(true); }, 700);
+  } else {
+    var extra = listenMode()==='letter' ? ' &nbsp; <span class="ans">'+glyph(MORSE[lTarget])+'</span>' : '';
+    lAnswer.className="answerline no";
+    lAnswer.innerHTML='&#10007; it was <b>'+String(lTarget).toUpperCase()+'</b>'+extra;
+    setTimeout(function(){ lNew(true); }, 1700);
+  }
+  lScore.textContent = lCorrect+" / "+lTotal;
+}
+
+el('lPlay').onclick=function(){ if(!lTarget) lNew(false); playText(lTarget, +wpm.value); lInput.focus(); };
+el('lReplay').onclick=function(){ if(lTarget) playText(lTarget, +wpm.value); lInput.focus(); };
+el('lNew').onclick=function(){ lNew(true); };
+
+var lmodes=document.querySelectorAll('input[name=lmode]');
+for(var mi=0; mi<lmodes.length; mi++){ lmodes[mi].onchange=function(){ lNew(false); }; }
+
+lInput.addEventListener('input', function(){
+  lInput.value = lInput.value.toUpperCase();
+  if(listenMode()==='letter' && lInput.value.length>=1) checkAnswer();
+});
+lInput.addEventListener('keydown', function(e){
+  if(e.key==='Enter'){ e.preventDefault(); checkAnswer(); }
+});
+
+/* LEARN MODE */
+var LEARN_WPM = 13;
+var LEARN_ORDER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function buildLearn(){
+  var html="", i, ch;
+  for(i=0;i<LEARN_ORDER.length;i++){
+    ch=LEARN_ORDER.charAt(i);
+    html += '<div class="learncell">'
+          +   '<span class="ch">'+ch+'</span>'
+          +   '<span class="cd">'+glyph(MORSE[ch])+'</span>'
+          +   '<button class="btn pbtn" data-ch="'+ch+'" title="Play '+ch+'">&#9658;</button>'
+          + '</div>';
+  }
+  el('learnGrid').innerHTML=html;
+}
+el('learnGrid').addEventListener('click', function(e){
+  var t=e.target;
+  while(t && t!==this && !(t.getAttribute && t.getAttribute('data-ch'))) t=t.parentNode;
+  if(t && t.getAttribute && t.getAttribute('data-ch')) playText(t.getAttribute('data-ch'), LEARN_WPM);
+});
+
+/* init */
+buildLearn();
+newTest();
+</script>
+</body>
+</html>

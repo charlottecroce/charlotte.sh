@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fruitbasket &mdash; charlotte.sh</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="fb" data-theme="dark">
+<div class="page">
+
+  <header>
+    <h1>charlotte.sh</h1>
+    <p class="subtitle">-.-. .... .- .-. .-.. --- - - .  -.-. .-. --- -.-. .</p>
+    <p class="meta">Burlington, VT &nbsp;&middot;&nbsp; <a href="https://github.com/charlottecroce">github.com/charlottecroce</a></p>
+    <nav class="nav">
+      <a href="index.html">home</a> &middot;
+      <!--<a href="blog.html">blog</a> &middot;-->
+      <a href="fruitbasket.html">fruitbasket</a> &middot;
+      <a href="morse.html">morse code</a>
+    </nav>
+  </header>
+
+  <hr>
+
+  <h2 class="page-title">Fruitbasket</h2>
+  <p class="intro">A fruit-toned color scheme for VS Code and terminal emulators.</p>
+
+  <div class="fb-toggle">
+    <button class="btn" id="themeBtn" onclick="fbToggle()">Switch to light mode</button>
+    <span class="fb-mode">Currently showing <strong id="fbModeName">Fruitbasket Dark</strong></span>
+  </div>
+
+  <div class="box">
+    <h2>Palette</h2>
+    <div class="body">
+
+      <div class="fb-group-title">Normal</div>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:rgb(var(--c0))"></div><div class="sw-name">black</div><div class="sw-rgb"><span class="light-only">64, 49, 58</span><span class="dark-only">42, 31, 36</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c1))"></div><div class="sw-name">red</div><div class="sw-rgb"><span class="light-only">188, 31, 104</span><span class="dark-only">210, 59, 128</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c2))"></div><div class="sw-name">green</div><div class="sw-rgb"><span class="light-only">63, 104, 65</span><span class="dark-only">106, 154, 108</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c3))"></div><div class="sw-name">yellow</div><div class="sw-rgb"><span class="light-only">150, 101, 10</span><span class="dark-only">224, 189, 108</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c4))"></div><div class="sw-name">blue</div><div class="sw-rgb"><span class="light-only">44, 86, 174</span><span class="dark-only">140, 175, 240</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c5))"></div><div class="sw-name">magenta</div><div class="sw-rgb"><span class="light-only">211, 63, 124</span><span class="dark-only">220, 84, 143</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c6))"></div><div class="sw-name">cyan</div><div class="sw-rgb"><span class="light-only">27, 122, 134</span><span class="dark-only">77, 172, 184</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c7))"></div><div class="sw-name">white</div><div class="sw-rgb"><span class="light-only">230, 219, 224</span><span class="dark-only">229, 229, 229</span></div></div>
+      </div>
+
+      <div class="fb-group-title">Bright</div>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:rgb(var(--c0i))"></div><div class="sw-name">bright black</div><div class="sw-rgb"><span class="light-only">138, 117, 128</span><span class="dark-only">122, 122, 122</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c1i))"></div><div class="sw-name">bright red</div><div class="sw-rgb"><span class="light-only">211, 63, 124</span><span class="dark-only">255, 138, 200</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c2i))"></div><div class="sw-name">bright green</div><div class="sw-rgb"><span class="light-only">81, 128, 83</span><span class="dark-only">138, 182, 140</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c3i))"></div><div class="sw-name">bright yellow</div><div class="sw-rgb"><span class="light-only">176, 126, 26</span><span class="dark-only">240, 203, 122</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c4i))"></div><div class="sw-name">bright blue</div><div class="sw-rgb"><span class="light-only">63, 106, 192</span><span class="dark-only">122, 159, 232</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c5i))"></div><div class="sw-name">bright magenta</div><div class="sw-rgb"><span class="light-only">196, 36, 114</span><span class="dark-only">255, 184, 217</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c6i))"></div><div class="sw-name">bright cyan</div><div class="sw-rgb"><span class="light-only">39, 147, 160</span><span class="dark-only">122, 202, 213</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--c7i))"></div><div class="sw-name">bright white</div><div class="sw-rgb"><span class="light-only">251, 242, 245</span><span class="dark-only">255, 255, 255</span></div></div>
+      </div>
+
+      <div class="fb-group-title">Interface</div>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:rgb(var(--bg))"></div><div class="sw-name">background</div><div class="sw-rgb"><span class="light-only">251, 242, 245</span><span class="dark-only">30, 26, 29</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--fg))"></div><div class="sw-name">foreground</div><div class="sw-rgb"><span class="light-only">64, 49, 58</span><span class="dark-only">229, 229, 229</span></div></div>
+        <div class="sw"><div class="chip" style="background:rgb(var(--cursor))"></div><div class="sw-name">cursor</div><div class="sw-rgb"><span class="light-only">188, 31, 104</span><span class="dark-only">220, 84, 143</span></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Terminal</h2>
+    <div class="body">
+      <div class="mock">
+        <div class="mock-bar">&mdash; bash &mdash; 80&times;24</div>
+        <div class="mock-body"><pre><span class="c2">charlotte</span><span class="c0i">@</span><span class="c6">fruitbasket</span> <span class="c4">~/projects</span> <span class="c1">$</span> ls --color
+<span class="c4">website</span>  <span class="c2">deploy.sh</span>  <span class="c5">fruitbasket.colorscheme</span>  README.md
+<span class="c2">charlotte</span><span class="c0i">@</span><span class="c6">fruitbasket</span> <span class="c4">~/projects</span> <span class="c1">$</span> git status
+On branch <span class="c2">main</span>
+Your branch is ahead of <span class="c3">'origin/main'</span> by <span class="c3">2</span> commits.
+
+Changes not staged for commit:
+  <span class="c1">modified:</span>   <span class="c6">siem/pipeline.conf</span>
+  <span class="c1">modified:</span>   <span class="c6">roles/elastic.yml</span>
+
+<span class="c2">charlotte</span><span class="c0i">@</span><span class="c6">fruitbasket</span> <span class="c4">~/projects</span> <span class="c1">$</span> <span class="cursor-block"></span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Editor</h2>
+    <div class="body">
+      <div class="mock">
+        <div class="mock-bar">harvest.py</div>
+        <div class="mock-body"><pre><span class="ln">1   </span><span class="c0i"># fruitbasket theme demo</span>
+<span class="ln">2   </span><span class="c1">def</span> <span class="c4">harvest</span>(basket):
+<span class="ln">3   </span>    fruits <span class="c1">=</span> [<span class="c2">"cherry"</span>, <span class="c2">"plum"</span>, <span class="c2">"peach"</span>]
+<span class="ln">4   </span>    <span class="c1">for</span> i, fruit <span class="c1">in</span> <span class="c4">enumerate</span>(fruits):
+<span class="ln">5   </span>        <span class="c4">print</span>(<span class="c2">f"{i}: {fruit}"</span>)
+<span class="ln">6   </span>    <span class="c1">return</span> <span class="c4">len</span>(basket) <span class="c1">+</span> <span class="c3">3</span>
+</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Get Fruitbasket</h2>
+    <div class="body">
+      <p>Two matching variants &mdash; one for your editor, one for your terminal.</p>
+      <div class="fb-downloads">
+        <a class="btn" href="https://marketplace.visualstudio.com/items?itemName=charlotte-dev.fruitbasket-theme">VS Code Marketplace &rarr;</a>
+        <a class="btn" href="https://github.com/charlottecroce/fruitbasket-terminal-theme">Terminal Theme &rarr;</a>
+
+      </div>
+      <p class="fb-dl-note"></p>
+    </div>
+  </div>
+
+  <footer>
+  </footer>
+
+</div>
+
+<script>
+function fbToggle(){
+  var b = document.body;
+  var dark = b.getAttribute('data-theme') === 'dark';
+  b.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = dark ? 'Switch to dark mode' : 'Switch to light mode';
+  document.getElementById('fbModeName').textContent = dark ? 'Fruitbasket Light' : 'Fruitbasket Dark';
+}
+</script>
+</body>
+</html>
